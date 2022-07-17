@@ -2,18 +2,28 @@ package result_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/axbannaz/resultNoption/result"
 )
 
-func returnErr() result.Result {
-	return result.Err(
-		errors.New("error"),
-	)
+func returnErr() result.Result[error] {
+	err := errors.New("I got an error")
+	var e result.Error[error]
+	e.Err = err
+	return e
 }
 
-func returnOk[T any](v T) result.Result {
+func returnError[T any](t *testing.T, v T) result.Result[T] {
+	t.Logf("T=%T", v)
+	err := fmt.Errorf("I got an error with v=%v", v)
+	var e result.Error[T]
+	e.Err = err
+	return e
+}
+
+func returnOk[T any](v T) result.Result[T] {
 	var ok result.Ok[T]
 	ok.Wrap(v)
 	return ok
@@ -22,11 +32,40 @@ func returnOk[T any](v T) result.Result {
 func TestResultErr(t *testing.T) {
 	opt := returnErr()
 	switch v := opt.(type) {
-	case result.Err:
+	case result.Error[error]:
 		t.Logf("v=%v", v)
 	default:
-		t.Fatal("not None")
+		t.Fatal("not Error")
 	}
+}
+
+func TestResultErrorFloat(t *testing.T) {
+	opt := returnError(t, 90.4)
+	switch v := opt.(type) {
+	case result.Error[float64]:
+		t.Logf("v=%v", v)
+	default:
+		t.Fatal("not Error")
+	}
+}
+
+func TestResultErrorString(t *testing.T) {
+	opt := returnError(t, "hell no")
+	switch v := opt.(type) {
+	case result.Error[string]:
+		t.Logf("v=%v", v)
+	default:
+		t.Fatal("not Error")
+	}
+}
+
+func TestOptionIsError(t *testing.T) {
+	opt := returnErr()
+	if !opt.IsError() {
+		t.Fatal("not Error")
+	}
+	t.Logf("v=%v", opt)
+	t.Logf("v=%v", opt.Error().Err)
 }
 
 func TestResultOk(t *testing.T) {
@@ -42,4 +81,14 @@ func TestResultOk(t *testing.T) {
 	default:
 		t.Fatalf("not Some int: %T", v)
 	}
+}
+
+func TestOptionIsOk(t *testing.T) {
+	someValuePi := 3.14
+	opt := returnOk(someValuePi)
+	if !opt.IsOk() {
+		t.Fatalf("not Some %T", opt)
+	}
+	t.Logf("v=%v", opt)
+	t.Logf("v=%v", opt.Ok().Unwrap())
 }
