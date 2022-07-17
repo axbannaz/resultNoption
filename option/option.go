@@ -1,6 +1,17 @@
 package option
 
+type Option[T any] interface {
+	IsNone() bool
+	IsSome() bool
+	Expect(err string) T
+	Unwrap() T
+	UnwrapOr(def T) T
+	UnwrapOrDefault() T
+	UnwrapOrElse(fn func() T) T
+}
+
 type None[T any] struct{}
+
 type Some[T any] struct {
 	v T
 }
@@ -66,14 +77,4 @@ func (_ Some[T]) IsNone() (ok bool) {
 func (_ Some[T]) IsSome() (ok bool) {
 	ok = true
 	return
-}
-
-type Option[T any] interface {
-	IsNone() bool
-	IsSome() bool
-	Expect(err string) T
-	Unwrap() T
-	UnwrapOr(def T) T
-	UnwrapOrDefault() T
-	UnwrapOrElse(fn func() T) T
 }
