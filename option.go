@@ -38,9 +38,9 @@ func (_ None[T]) Expect(err string) T {
 }
 
 func (_ None[T]) OkOr(msg string) (r Result[T]) {
-	r = Error[T]{
-		Err: errors.New(msg),
-	}
+	var err Error[T]
+	r = err
+	err.Wrap(errors.New(msg))
 
 	return
 }
