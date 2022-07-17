@@ -1,4 +1,4 @@
-package result
+package result_option
 
 type Result[T any] interface {
 	IsError() bool

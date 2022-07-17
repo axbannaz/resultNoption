@@ -1,11 +1,11 @@
-package result_test
+package result_option_test
 
 import (
 	"errors"
 	"fmt"
 	"testing"
 
-	"github.com/axbannaz/resultNoption/result"
+	result "github.com/axbannaz/resultNoption"
 )
 
 func returnErr() result.Result[error] {

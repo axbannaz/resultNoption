@@ -1,9 +1,9 @@
-package option_test
+package result_option_test
 
 import (
 	"testing"
 
-	"github.com/axbannaz/resultNoption/option"
+	option "github.com/axbannaz/resultNoption"
 )
 
 func returnNone() option.Option[any] {
