@@ -14,42 +14,57 @@ func (n None[T]) IsSome() (ok bool) {
 	return
 }
 
-func (n None[T]) None() None[T] {
-	return n
-}
-
-func (n None[T]) Some() Some[T] {
+func (_ None[T]) Unwrap() T {
 	panic("invalid type")
 }
 
-func (s Some[T]) Unwrap() (t T) {
+func (_ None[T]) UnwrapOr(defaultT T) T {
+	return defaultT
+}
+
+func (_ None[T]) UnwrapOrDefault() T {
+	var n T
+	return n
+}
+
+func (_ None[T]) UnwrapOrElse(f func() T) T {
+	return f()
+}
+
+func (s Some[T]) Unwrap() T {
 	return s.v
+}
+
+func (s Some[T]) UnwrapOr(_ T) T {
+	return s.Unwrap()
+}
+
+func (s Some[T]) UnwrapOrDefault() T {
+	return s.Unwrap()
+}
+
+func (s Some[T]) UnwrapOrElse(_ func() T) T {
+	return s.Unwrap()
 }
 
 func (s *Some[T]) Wrap(t T) {
 	s.v = t
 }
 
-func (s Some[T]) IsNone() (ok bool) {
+func (_ Some[T]) IsNone() (ok bool) {
 	return
 }
 
-func (s Some[T]) IsSome() (ok bool) {
+func (_ Some[T]) IsSome() (ok bool) {
 	ok = true
 	return
-}
-
-func (s Some[T]) None() None[T] {
-	panic("invalid type")
-}
-
-func (s Some[T]) Some() Some[T] {
-	return s
 }
 
 type Option[T any] interface {
 	IsNone() bool
 	IsSome() bool
-	Some() Some[T]
-	None() None[T]
+	Unwrap() T
+	UnwrapOr(def T) T
+	UnwrapOrDefault() T
+	UnwrapOrElse(fn func() T) T
 }
