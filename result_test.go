@@ -31,12 +31,13 @@ func returnOk[T any](v T) result.Result[T] {
 
 func TestResultErr(t *testing.T) {
 	opt := returnErr()
-	switch v := opt.(type) {
+	switch opt.(type) {
 	case result.Error[error]:
-		t.Logf("v=%v", v)
 	default:
 		t.Fatal("not Error")
 	}
+
+	t.Logf("v=%v", opt.Error())
 }
 
 func TestResultErrorFloat(t *testing.T) {
