@@ -21,8 +21,6 @@ func TestOptionNone(t *testing.T) {
 	switch v := opt.(type) {
 	case option.None[any]:
 		t.Logf("v=%v", v)
-	case option.Some[any]:
-		t.Fatal("not None")
 	default:
 		t.Fatal("not None")
 	}
