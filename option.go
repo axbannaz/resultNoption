@@ -1,5 +1,7 @@
 package result_option
 
+import "errors"
+
 type Option[T any] interface {
 	IsNone() bool
 	IsSome() bool
@@ -8,6 +10,8 @@ type Option[T any] interface {
 	UnwrapOr(def T) T
 	UnwrapOrDefault() T
 	UnwrapOrElse(fn func() T) T
+	OkOr(msg string) Result[T]
+	OkOrElse(fn func() string) Result[T]
 }
 
 type None[T any] struct{}
@@ -33,6 +37,20 @@ func (_ None[T]) Expect(err string) T {
 	panic(err)
 }
 
+func (_ None[T]) OkOr(msg string) (r Result[T]) {
+	r = Error[T]{
+		Err: errors.New(msg),
+	}
+
+	return
+}
+
+func (n None[T]) OkOrElse(fn func() string) (r Result[T]) {
+	r = n.OkOr(fn())
+
+	return
+}
+
 func (_ None[T]) UnwrapOr(defaultT T) T {
 	return defaultT
 }
@@ -48,6 +66,20 @@ func (_ None[T]) UnwrapOrElse(f func() T) T {
 
 func (s Some[T]) Expect(_ string) T {
 	return s.Unwrap()
+}
+
+func (s Some[T]) OkOr(_ string) (r Result[T]) {
+	var ok Ok[T]
+
+	ok.Wrap(s.Unwrap())
+
+	return ok
+}
+
+func (s Some[T]) OkOrElse(_ func() string) (r Result[T]) {
+	r = s.OkOr("")
+
+	return
 }
 
 func (s Some[T]) Unwrap() T {
