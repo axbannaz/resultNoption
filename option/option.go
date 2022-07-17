@@ -18,6 +18,10 @@ func (_ None[T]) Unwrap() T {
 	panic("invalid type")
 }
 
+func (_ None[T]) Expect(err string) T {
+	panic(err)
+}
+
 func (_ None[T]) UnwrapOr(defaultT T) T {
 	return defaultT
 }
@@ -29,6 +33,10 @@ func (_ None[T]) UnwrapOrDefault() T {
 
 func (_ None[T]) UnwrapOrElse(f func() T) T {
 	return f()
+}
+
+func (s Some[T]) Expect(_ string) T {
+	return s.Unwrap()
 }
 
 func (s Some[T]) Unwrap() T {
@@ -63,6 +71,7 @@ func (_ Some[T]) IsSome() (ok bool) {
 type Option[T any] interface {
 	IsNone() bool
 	IsSome() bool
+	Expect(err string) T
 	Unwrap() T
 	UnwrapOr(def T) T
 	UnwrapOrDefault() T
