@@ -5,15 +5,15 @@ import "fmt"
 type Result[T any] interface {
 	IsError() bool
 	IsOk() bool
-	Error() Error[T]
-	Ok() Ok[T]
 	Expect(msg string) T
 	Unwrap() T
 	UnwrapOr(def T) T
+	Err() Option[error]
+	Ok() Option[T]
 }
 
 type Error[T any] struct {
-	Err error
+	err error
 }
 
 type Ok[T any] struct {
@@ -33,7 +33,7 @@ func (o *Ok[T]) Wrap(t T) {
 }
 
 func (o Error[T]) unwrap() error {
-	return o.Err
+	return o.err
 }
 
 func (o Error[T]) Unwrap() T {
@@ -46,7 +46,7 @@ func (o Error[T]) Expect(msg string) T {
 }
 
 func (o *Error[T]) Wrap(t error) {
-	o.Err = t
+	o.err = t
 }
 
 func (_ Error[T]) IsError() (ok bool) {
@@ -58,12 +58,16 @@ func (_ Error[T]) IsOk() (ok bool) {
 	return
 }
 
-func (n Error[T]) Error() Error[T] {
+func (_ Error[T]) Ok() Option[T] {
+	var n None[T]
 	return n
 }
 
-func (_ Error[T]) Ok() Ok[T] {
-	panic("invalid type")
+func (n Error[T]) Err() Option[error] {
+	var o Some[error]
+	o.Wrap(n.unwrap())
+
+	return o
 }
 
 func (_ Error[T]) UnwrapOr(defaultT T) T {
@@ -87,7 +91,14 @@ func (_ Ok[T]) Error() Error[T] {
 	panic("invalid type")
 }
 
-func (n Ok[T]) Ok() Ok[T] {
+func (n Ok[T]) Ok() (o Option[T]) {
+	var s Some[T]
+	s.Wrap(n.Unwrap())
+	return s
+}
+
+func (_ Ok[T]) Err() Option[error] {
+	var n None[error]
 	return n
 }
 

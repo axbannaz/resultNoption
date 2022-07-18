@@ -11,7 +11,7 @@ import (
 func returnErr() result.Result[error] {
 	err := errors.New("I got an error")
 	var e result.Error[error]
-	e.Err = err
+	e.Wrap(err)
 	return e
 }
 
@@ -19,7 +19,7 @@ func returnError[T any](t *testing.T, v T) result.Result[T] {
 	t.Logf("T=%T", v)
 	err := fmt.Errorf("I got an error with v=%v", v)
 	var e result.Error[T]
-	e.Err = err
+	e.Wrap(err)
 	return e
 }
 
@@ -37,7 +37,7 @@ func TestResultErr(t *testing.T) {
 		t.Fatal("not Error")
 	}
 
-	t.Logf("v=%v", opt.Error())
+	t.Logf("v=%v", opt.Err().Unwrap())
 }
 
 func TestResultErrorFloat(t *testing.T) {
@@ -66,7 +66,7 @@ func TestOptionIsError(t *testing.T) {
 		t.Fatal("not Error")
 	}
 	t.Logf("v=%v", opt)
-	t.Logf("v=%v", opt.Error().Err)
+	t.Logf("v=%v", opt.Err().Unwrap())
 }
 
 func TestResultOk(t *testing.T) {
