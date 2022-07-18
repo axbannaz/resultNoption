@@ -6,32 +6,10 @@ import (
 	option "github.com/axbannaz/resultNoption"
 )
 
-func returnNone() option.Option[any] {
-	return option.None[any]{}
-}
-
 func returnSome[T any](v T) option.Option[T] {
 	var some option.Some[T]
 	some.Wrap(v)
 	return some
-}
-
-func TestOptionNone(t *testing.T) {
-	opt := returnNone()
-	switch v := opt.(type) {
-	case option.None[any]:
-		t.Logf("v=%v", v)
-	default:
-		t.Fatal("not None")
-	}
-}
-
-func TestOptionIsNone(t *testing.T) {
-	opt := returnNone()
-	if !opt.IsNone() {
-		t.Fatal("not None")
-	}
-	t.Logf("v=%v", opt)
 }
 
 func TestOptionSome(t *testing.T) {
